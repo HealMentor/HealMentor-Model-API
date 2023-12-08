@@ -82,9 +82,21 @@ def predict(input_data):
     panic = convert_panic(input_data["panic"])
     treatment = convert_treatment(input_data["treatment"])
     
+    cgpa = float(input_data["cgpa"])
+    if cgpa >= 4:
+        cgpa_score = 0
+    elif cgpa >= 3:
+        cgpa_score = 1
+    elif cgpa >= 2:
+        cgpa_score = 2
+    elif cgpa >= 1:
+        cgpa_score = 3
+    else:
+        cgpa_score = 4
+    
     input_array = [
         gender, input_data["age"], major,
-        input_data["year"], input_data["cgpa"], marriage,
+        input_data["year"], cgpa_score, marriage,
         anxiety, panic, treatment
     ]
     # Contoh penggunaan model untuk membuat prediksi
