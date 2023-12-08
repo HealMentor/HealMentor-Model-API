@@ -123,6 +123,9 @@ def prediction():
             result = predict(data)  # Memanggil fungsi prediksi dengan data yang lengkap
             depression_prediction = result.item()  # Misalnya, hasil prediksi Depression berada di index pertama dari hasil prediksi
             
+            prediction_percentage = depression_prediction * 100
+            prediction_result = int(prediction_percentage)
+            
             if depression_prediction > 0.5:
                 depression_result = "Iya"
             else:
@@ -134,7 +137,7 @@ def prediction():
                     "message": "Success",
                 },
                 "data": {
-                    "prediction": depression_prediction,
+                    "prediction": prediction_result,
                     "depression": depression_result
                 }
             }), 200
