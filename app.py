@@ -1,10 +1,28 @@
+import os
+import traceback
+import tensorflow as tf
+import numpy as np
+
+from pydantic import BaseModel
+from urllib.request import Request
 from flask import Flask, jsonify, request
 from tensorflow.keras.models import load_model
+from utils import load_image_into_numpy_array
+from PIL import Image
+from io import BytesIO
+from tensorflow.lite.python.interpreter import Interpreter
 
 app = Flask(__name__)
 
 # Memuat model saat aplikasi dimulai
-model = load_model('model.h5')
+model_depression = load_model('model.h5')
+
+# Load the TFLite model
+interpreter = Interpreter(model_path="model-float-tl.tflite")
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 def convert_gender(gender_string):
     if gender_string.lower() == "female":
@@ -101,7 +119,7 @@ def predict(input_data):
     ]
     # Contoh penggunaan model untuk membuat prediksi
     # Pastikan untuk mengubah kode ini sesuai dengan model Anda
-    prediction_result = model.predict([input_array])
+    prediction_result = model_depression.predict([input_array])
     return prediction_result
 
 @app.route("/")
@@ -157,6 +175,48 @@ def prediction():
             },
             "data": None
         }), 405
+        
+@app.route("/expression", methods=["GET", "POST"])
+def expression():
+    try:
+        file = request.files['file']
+        
+        # Ensure the uploaded file is an image
+        if file.content_type not in ["image/jpeg", "image/png"]:
+            return jsonify({"error": "File is not an image"}), 400
+        
+        # Preprocess the image
+        img = Image.open(BytesIO(file.read()))
+        img = img.resize((input_details[0]['shape'][1], input_details[0]['shape'][2]))
+        img_array = np.array(img, dtype=np.float32) / 255.0
+        
+        # Set the image as input to the model
+        interpreter.set_tensor(input_details[0]['index'], [img_array])
+        interpreter.invoke()
+        
+        # Get the model output
+        output_data = interpreter.get_tensor(output_details[0]['index'])
+        
+        # Map the output to emotions
+        emotions = {
+            0: "marah",
+            1: "penghinaan",
+            2: "jijik",
+            3: "takut",
+            4: "senang",
+            5: "sedih",
+            6: "kejutan"
+        }
+        
+        # Convert model output to emotions label
+        predicted_class = np.argmax(output_data)
+        emotion_label = emotions.get(predicted_class, "Tidak dikenali")
+        
+        return jsonify({"emotion": emotion_label}), 200
+        
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": "Internal Server Error"}), 500
 
 if __name__ == "__main__":
     app.run()
