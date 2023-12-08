@@ -14,6 +14,26 @@ def convert_gender(gender_string):
     else:
         # Nilai default atau error handling jika tidak sesuai
         return -1
+
+def convert_major(major_string):
+    if major_string.lower() == "ekonomi":
+        return 10
+    elif major_string.lower() == "hukum":
+        return 15
+    elif major_string.lower() == "engineering":
+        return 17
+    elif major_string.lower() == "law":
+        return 15
+    elif major_string.lower() == "sistem informasi":
+        return 20
+    elif major_string.lower() == "teknik informatika":
+        return 31
+    elif major_string.lower() == "sipil":
+        return 32
+    elif major_string.lower() == "kedokteran":
+        return 35
+    else:
+        return 9
     
 def convert_marriage(marriage_string):
     if marriage_string.lower() == "single":
@@ -56,13 +76,14 @@ def predict(input_data):
     
     # Konversi nilai "gender" dari string ke integer sebelum dimasukkan ke input_array
     gender = convert_gender(input_data["gender"])
+    major = convert_major(input_data["major"])
     marriage = convert_marriage(input_data["marriage"])
     anxiety = convert_anxiety(input_data["anxiety"])
     panic = convert_panic(input_data["panic"])
     treatment = convert_treatment(input_data["treatment"])
     
     input_array = [
-        gender, input_data["age"], input_data["major"],
+        gender, input_data["age"], major,
         input_data["year"], input_data["cgpa"], marriage,
         anxiety, panic, treatment
     ]
