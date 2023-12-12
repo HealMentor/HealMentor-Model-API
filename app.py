@@ -3,11 +3,8 @@ import traceback
 import tensorflow as tf
 import numpy as np
 
-from pydantic import BaseModel
-from urllib.request import Request
 from flask import Flask, jsonify, request
 from tensorflow.keras.models import load_model
-from utils import load_image_into_numpy_array
 from PIL import Image
 from io import BytesIO
 from tensorflow.lite.python.interpreter import Interpreter
