@@ -1,10 +1,8 @@
-import os
 import traceback
-import tensorflow as tf
 import numpy as np
 
 from flask import Flask, jsonify, request
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 from PIL import Image
 from io import BytesIO
 from tensorflow.lite.python.interpreter import Interpreter
